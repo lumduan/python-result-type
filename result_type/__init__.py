@@ -42,7 +42,23 @@ from .core import (
                    success,
 )
 
-__version__ = "1.0.1"
+# Import async functionality (optional)
+try:
+    from .async_result import (
+        AsyncResult,
+        async_safe_call,
+        async_safe_call_decorator,
+        async_success,
+        async_failure,
+        gather_results,
+        gather_results_all_settled,
+        from_awaitable,
+    )
+    _ASYNC_AVAILABLE = True
+except ImportError:
+    _ASYNC_AVAILABLE = False
+
+__version__ = "1.1.0"
 __author__ = "Sarat"
 __email__ = "sarat@example.com"
 
@@ -56,3 +72,16 @@ __all__ = [
     "safe_call",
     "safe_call_decorator",
 ]
+
+# Add async exports if available
+if _ASYNC_AVAILABLE:
+    __all__.extend([
+        "AsyncResult",
+        "async_safe_call",
+        "async_safe_call_decorator",
+        "async_success",
+        "async_failure",
+        "gather_results",
+        "gather_results_all_settled",
+        "from_awaitable",
+    ])

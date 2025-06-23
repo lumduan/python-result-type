@@ -228,6 +228,111 @@ print(result.is_failure())  # True
 print(type(result.error))   # <class 'ZeroDivisionError'>
 ```
 
+## 🔄 Async/Await Support
+
+The library includes full async/await support for modern Python applications with the `AsyncResult` wrapper:
+
+### Basic Async Usage
+
+```python
+import asyncio
+from result_type import Success, Failure, Result
+from result_type.async_result import AsyncResult, async_safe_call
+
+async def fetch_user(user_id: int) -> Result[dict, str]:
+    await asyncio.sleep(0.1)  # Simulate API call
+    if user_id <= 0:
+        return Failure("Invalid user ID")
+    return Success({"id": user_id, "name": f"User {user_id}"})
+
+# Use async operations
+result = await fetch_user(123)
+if result.is_success():
+    print(f"Found user: {result.value}")
+```
+
+### Async Chaining
+
+Chain async and sync operations seamlessly:
+
+```python
+async def fetch_user_posts(user: dict) -> Result[list, str]:
+    await asyncio.sleep(0.1)
+    return Success([f"Post {i}" for i in range(3)])
+
+def format_summary(posts: list) -> Result[str, str]:
+    return Success(f"User has {len(posts)} posts")
+
+# Chain async and sync operations
+pipeline = (AsyncResult(fetch_user(123))
+           .then_async(fetch_user_posts)    # Async operation
+           .then_sync(format_summary))      # Sync operation
+
+result = await pipeline.resolve()
+if result.is_success():
+    print(result.value)  # "User has 3 posts"
+```
+
+### Async Safe Calls
+
+Handle async exceptions safely:
+
+```python
+from result_type.async_result import async_safe_call, async_safe_call_decorator
+
+# Function approach
+async def risky_api_call():
+    # Might raise an exception
+    return await some_external_api()
+
+result = await async_safe_call(risky_api_call, "API Error")
+
+# Decorator approach
+@async_safe_call_decorator("Database Error")
+async def database_operation():
+    return await db.fetch_data()
+
+result = await database_operation()  # Returns Result[Any, str]
+```
+
+### Gathering Multiple Async Results
+
+Process multiple async operations concurrently:
+
+```python
+from result_type.async_result import gather_results
+
+async def fetch_data(source: str) -> Result[str, str]:
+    await asyncio.sleep(0.1)
+    return Success(f"Data from {source}")
+
+# Gather results - stops at first failure
+async_operations = [
+    AsyncResult(fetch_data("source1")),
+    AsyncResult(fetch_data("source2")),
+    AsyncResult(fetch_data("source3")),
+]
+
+combined = await gather_results(*async_operations)
+if combined.is_success():
+    print(combined.value)  # ["Data from source1", "Data from source2", "Data from source3"]
+```
+
+### Converting Regular Awaitables
+
+Convert any awaitable to an AsyncResult:
+
+```python
+from result_type.async_result import from_awaitable
+
+async def regular_async_function():
+    return {"data": "success"}
+
+# Convert to AsyncResult with error handling
+async_result = await from_awaitable(regular_async_function(), "Operation failed")
+result = await async_result.resolve()
+```
+
 ## 🆚 Comparison with Alternatives
 
 ### vs PyMonad Either

@@ -4,15 +4,15 @@ build-backend = "hatchling.build"
 
 [project]
 name = "python-result-type"
-version = "1.0.1"
-description = "A functional programming Result type for Python with Success/Failure variants"
+version = "1.1.0"
+description = "A functional programming Result type for Python with Success/Failure variants and async support"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.8"
 authors = [
-    {name = "Sarat", email = "sarat@example.com"},
+    {name = "batt", email = "b@candythink.com"},
 ]
-keywords = ["functional-programming", "error-handling", "result-type", "monads", "rust-like"]
+keywords = ["functional-programming", "error-handling", "result-type", "monads", "rust-like", "async", "await"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -39,6 +39,7 @@ Issues = "https://github.com/lumduan/python-result-type/issues"
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",
     "mypy>=1.0.0",
     "black>=22.0.0",
     "ruff>=0.1.0",
