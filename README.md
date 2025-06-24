@@ -607,6 +607,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📈 Changelog
 
+### 1.2.1
+
+- **Fixed**: Mypy warning `"Result[T, E]" has no attribute "error"` when accessing `result.error`
+- **Fixed**: Mypy warning `"Result[T, E]" has no attribute "value"` when accessing `result.value`
+- **Enhanced**: Added `value` and `error` properties to the abstract `Result` class for better type checking
+- **Improved**: Better mypy compatibility and type safety throughout the codebase
+- **Maintained**: Full backward compatibility - no breaking changes to existing code
+
 ### 1.2.0
 
 - **New**: Rust-like aliases `Ok` and `Err` for `Success` and `Failure`

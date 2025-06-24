@@ -67,7 +67,7 @@ try:
 except ImportError:
     _ASYNC_AVAILABLE = False
 
-__version__ = "1.2.0"
+__version__ = "1.2.1"
 __author__ = "Sarat"
 __email__ = "sarat@example.com"
 

@@ -176,7 +176,7 @@ class AsyncResult(Generic[T, E]):
             except Exception as e:
                 return AsyncResult(Failure(str(e)))
         else:
-            return AsyncResult(result)  # type: ignore
+            return AsyncResult(result)
     
     async def unwrap_async(self) -> T:
         """
@@ -217,15 +217,18 @@ class AsyncResult(Generic[T, E]):
         result = await self.resolve()
         
         if isinstance(result, Success):
-            return result.value
+            return result.value  # type: ignore[no-any-return]
         else:
             try:
                 computed = func(result.error)
                 if asyncio.iscoroutine(computed) or hasattr(computed, '__await__'):
-                    return await computed
+                    # computed is Awaitable[T], await will give us T
+                    awaited_result = await computed
+                    return awaited_result
+                # computed is T
                 return computed
             except Exception as e:
-                raise RuntimeError(f"Error in unwrap_or_else_async: {e}")
+                raise RuntimeError(f"Error in unwrap_or_else_async: {e}") from e
     
     def __await__(self) -> Generator[Any, None, Result[T, E]]:
         """Allow AsyncResult to be awaited directly."""

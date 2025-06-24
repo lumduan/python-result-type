@@ -42,6 +42,36 @@ class Result(Generic[T, E], ABC):
     with a value of type T, or fail with an error of type E.
     """
     
+    @property
+    def value(self) -> T:
+        """
+        Access the success value.
+        
+        Returns:
+            The success value if this is Success
+            
+        Raises:
+            AttributeError: If this is a Failure
+        """
+        if self.is_success():
+            return self._value  # type: ignore
+        raise AttributeError("'Failure' object has no attribute 'value'")
+    
+    @property
+    def error(self) -> E:
+        """
+        Access the error value.
+        
+        Returns:
+            The error value if this is Failure
+            
+        Raises:
+            AttributeError: If this is a Success
+        """
+        if self.is_failure():
+            return self._error  # type: ignore
+        raise AttributeError("'Success' object has no attribute 'error'")
+    
     @abstractmethod
     def is_success(self) -> bool:
         """Check if this Result is a Success."""
@@ -160,7 +190,7 @@ class Success(Result[T, E]):
     """
     
     def __init__(self, value: T):
-        self.value = value
+        self._value = value
     
     def is_success(self) -> bool:
         return True
@@ -171,7 +201,7 @@ class Success(Result[T, E]):
     def then(self, func: Callable[[T], Result[U, E]]) -> Result[U, E]:
         """Apply function to success value, returning new Result."""
         try:
-            return func(self.value)
+            return func(self._value)
         except Exception as e:
             # If function throws, convert to Failure
             return Failure(e)  # type: ignore
@@ -179,7 +209,7 @@ class Success(Result[T, E]):
     def map(self, func: Callable[[T], U]) -> Result[U, E]:
         """Transform success value, wrapping result in Success."""
         try:
-            return Success(func(self.value))
+            return Success(func(self._value))
         except Exception as e:
             # If function throws, convert to Failure
             return Failure(e)  # type: ignore
@@ -190,21 +220,21 @@ class Success(Result[T, E]):
     
     def unwrap(self) -> T:
         """Return the success value."""
-        return self.value
+        return self._value
     
     def unwrap_or(self, default: T) -> T:
         """Return the success value (ignoring default)."""
-        return self.value
+        return self._value
     
     def unwrap_or_else(self, func: Callable[[E], T]) -> T:
         """Return the success value (ignoring function)."""
-        return self.value
+        return self._value
     
     def __repr__(self) -> str:
-        return f"Success({self.value!r})"
+        return f"Success({self._value!r})"
     
-    def __eq__(self, other) -> bool:
-        return isinstance(other, Success) and self.value == other.value
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, Success) and self._value == other._value
 
 
 class Failure(Result[T, E]):
@@ -213,7 +243,7 @@ class Failure(Result[T, E]):
     """
     
     def __init__(self, error: E):
-        self.error = error
+        self._error = error
     
     def is_success(self) -> bool:
         return False
@@ -232,14 +262,14 @@ class Failure(Result[T, E]):
     def map_error(self, func: Callable[[E], Any]) -> Result[T, Any]:
         """Transform error value, wrapping result in Failure."""
         try:
-            return Failure(func(self.error))
+            return Failure(func(self._error))
         except Exception as e:
             # If function throws, return new failure with exception
             return Failure(str(e))
     
     def unwrap(self) -> T:
         """Raise exception with error information."""
-        raise RuntimeError(f"Called unwrap on Failure: {self.error}")
+        raise RuntimeError(f"Called unwrap on Failure: {self._error}")
     
     def unwrap_or(self, default: T) -> T:
         """Return the default value."""
@@ -248,17 +278,17 @@ class Failure(Result[T, E]):
     def unwrap_or_else(self, func: Callable[[E], T]) -> T:
         """Compute value from error using provided function."""
         try:
-            return func(self.error)
+            return func(self._error)
         except Exception as e:
             # If function throws, we need to handle it somehow
             # Since we must return T, we'll re-raise
-            raise RuntimeError(f"Error in unwrap_or_else: {e}")
+            raise RuntimeError(f"Error in unwrap_or_else: {e}") from e
     
     def __repr__(self) -> str:
-        return f"Failure({self.error!r})"
+        return f"Failure({self._error!r})"
     
-    def __eq__(self, other) -> bool:
-        return isinstance(other, Failure) and self.error == other.error
+    def __eq__(self, other: object) -> bool:
+        return isinstance(other, Failure) and self._error == other._error
 
 
 # Type alias for convenience
