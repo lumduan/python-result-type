@@ -265,6 +265,11 @@ class Failure(Result[T, E]):
 ResultType = Union[Success[T, E], Failure[T, E]]
 
 
+# Rust-like aliases for developers familiar with Rust Result type
+Ok = Success  # Rust-style alias for Success
+Err = Failure  # Rust-style alias for Failure
+
+
 # Helper functions for creating Results
 def success(value: T) -> Success[T, Any]:
     """Create a Success result."""
@@ -276,7 +281,17 @@ def failure(error: E) -> Failure[Any, E]:
     return Failure(error)
 
 
-def safe_call(func: Callable[[], T], error_msg: str | None = None) -> Result[T, str]:
+def ok(value: T) -> Success[T, Any]:
+    """Create an Ok (Success) result - Rust-style alias."""
+    return Success(value)
+
+
+def err(error: E) -> Failure[Any, E]:
+    """Create an Err (Failure) result - Rust-style alias."""
+    return Failure(error)
+
+
+def safe_call(func: Callable[[], T], error_msg: Union[str, None] = None) -> Result[T, str]:
     """
     Safely call a function that might raise an exception.
     
@@ -295,7 +310,7 @@ def safe_call(func: Callable[[], T], error_msg: str | None = None) -> Result[T, 
         return Failure(error_text)
 
 
-def safe_call_decorator(error_msg: str | None = None):
+def safe_call_decorator(error_msg: Union[str, None] = None) -> Callable[[Callable[[], T]], Callable[[], Result[T, str]]]:
     """
     Decorator for safely calling functions that might raise exceptions.
     

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "python-result-type"
-version = "1.1.0"
+version = "1.2.0"
 description = "A functional programming Result type for Python with Success/Failure variants and async support"
 readme = "README.md"
 license = "MIT"

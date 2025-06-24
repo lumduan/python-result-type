@@ -10,9 +10,11 @@ A functional programming **Result type** for Python, inspired by Rust's `Result<
 ## 🚀 Features
 
 - **Intuitive API**: `Success` and `Failure` instead of cryptic `Right`/`Left`
+- **Rust-like Aliases**: Optional `Ok` and `Err` aliases for Rust developers
 - **Type Safe**: Full generic type support with `Result[T, E]`  
 - **Chainable Operations**: Use `.then()` method or `>>` operator for clean chaining
 - **Exception Safety**: Automatic exception handling in chained operations
+- **Async/Await Support**: Full async support with `AsyncResult` wrapper
 - **Zero Dependencies**: Pure Python with no external dependencies
 - **Comprehensive**: Includes helper functions and decorators for common patterns
 - **Well Tested**: 100% test coverage with extensive edge case testing
@@ -120,6 +122,45 @@ def risky_database_operation():
 result = risky_database_operation()
 ```
 
+### Rust-like Aliases (Ok/Err)
+
+For developers familiar with Rust's `Result<T, E>`, this library provides `Ok` and `Err` aliases for `Success` and `Failure`:
+
+```python
+from result_type import Ok, Err, ok, err
+
+def divide_rust_style(a: float, b: float):
+    if b == 0:
+        return Err("Division by zero")
+    return Ok(a / b)
+
+# Usage is identical to Success/Failure
+result = divide_rust_style(10, 2)
+if result.is_success():
+    print(f"Result: {result.value}")  # Result: 5.0
+
+# Chain operations using Rust-style
+def multiply_by_2(x):
+    return Ok(x * 2)
+
+def validate_positive(x):
+    if x > 0:
+        return Ok(x)
+    return Err("Must be positive")
+
+result = Ok(5) >> multiply_by_2 >> validate_positive
+if result.is_success():
+    print(f"Final: {result.value}")  # Final: 10
+
+# Helper functions with Rust naming
+success_result = ok(42)      # Same as Success(42)
+error_result = err("oops")   # Same as Failure("oops")
+
+# Mix and match - they're the same types!
+mixed_result = Ok(10) >> (lambda x: Success(x * 2))  # Works perfectly
+print(Ok(42) == Success(42))  # True
+```
+
 ## 📚 Complete API Reference
 
 ### Core Types
@@ -153,6 +194,29 @@ Represents failed result containing an error.
 failure_result = Failure("Something went wrong")
 print(failure_result.error)  # "Something went wrong"
 print(failure_result.is_failure())  # True
+```
+
+### Rust-like Aliases
+
+#### `Ok` and `Err`
+Type aliases for `Success` and `Failure` respectively.
+
+```python
+from result_type import Ok, Err
+
+# These are identical to Success/Failure
+ok_result = Ok(42)          # Same as Success(42)
+err_result = Err("error")   # Same as Failure("error")
+```
+
+#### `ok(value: T) -> Success[T]` and `err(error: E) -> Failure[E]`
+Helper functions with Rust-style naming.
+
+```python
+from result_type import ok, err
+
+result = ok(42)        # Same as success(42) or Success(42)
+error = err("oops")    # Same as failure("oops") or Failure("oops")
 ```
 
 ### Helper Functions
@@ -542,6 +606,24 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Functional programming patterns from Haskell's Either type
 
 ## 📈 Changelog
+
+### 1.2.0
+
+- **New**: Rust-like aliases `Ok` and `Err` for `Success` and `Failure`
+- **New**: Helper functions `ok()` and `err()` with Rust-style naming
+- **Enhanced**: Full compatibility between Rust aliases and original naming
+- **Improved**: Better developer experience for Rust developers
+- **Added**: Comprehensive tests and examples for Rust-style usage
+
+### 1.1.0
+
+- **New**: Full async/await support with `AsyncResult` wrapper
+- **New**: `async_safe_call` and `async_safe_call_decorator` for async exception handling
+- **New**: Async chaining operations with `.then_async()` and `.then_sync()`
+- **New**: `gather_results()` for concurrent async operations
+- **New**: `from_awaitable()` to convert regular awaitables to AsyncResult
+- **Improved**: Enhanced type annotations for better IDE support
+- **Enhanced**: Better error messages and stack traces
 
 ### 1.0.0
 

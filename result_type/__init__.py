@@ -4,6 +4,11 @@ Python Result Type Library
 A functional programming pattern for handling operations that can succeed or fail.
 Inspired by Rust's Result<T, E> with intuitive Success/Failure naming.
 
+For Rust developers, Ok/Err aliases are also available:
+    >>> from result_type import Ok, Err
+    >>> result = Ok(42)  # Same as Success(42)
+    >>> error = Err("oops")  # Same as Failure("oops")
+
 Basic Usage:
     >>> from result_type import Success, Failure, safe_call
     >>>
@@ -32,14 +37,18 @@ Safe Function Calls:
 """
 
 from .core import (
-                   Failure,
-                   Result,
-                   ResultType,
-                   Success,
-                   failure,
-                   safe_call,
-                   safe_call_decorator,
-                   success,
+    Err,
+    Failure,
+    Ok,
+    Result,
+    ResultType,
+    Success,
+    err,
+    failure,
+    ok,
+    safe_call,
+    safe_call_decorator,
+    success,
 )
 
 # Import async functionality (optional)
@@ -58,7 +67,7 @@ try:
 except ImportError:
     _ASYNC_AVAILABLE = False
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 __author__ = "Sarat"
 __email__ = "sarat@example.com"
 
@@ -71,6 +80,11 @@ __all__ = [
     "failure",
     "safe_call",
     "safe_call_decorator",
+    # Rust-like aliases
+    "Ok",
+    "Err",
+    "ok",
+    "err",
 ]
 
 # Add async exports if available
